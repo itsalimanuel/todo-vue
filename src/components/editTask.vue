@@ -67,7 +67,7 @@ export default {
 
 <template>
   <div
-    class="addTask font-black drop-shadow-xl fixed top-0 left-0 overflow-hidden z-30 bg-blue-800 lg:w-1/3 lg:h-screen rounded-r-lg"
+    class="drop-shadow-xl fixed top-0 left-0 overflow-hidden z-30 bg-blue-800 max-2xl:w-1/3 max-xl:w-1/2 max-md:w-1/2 max-sm:w-full lg:h-screen rounded-r-lg"
   >
     <div
       class="p-4 text-slate-50 font-black border-b-2 justify-between flex"
