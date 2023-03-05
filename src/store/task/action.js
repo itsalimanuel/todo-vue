@@ -5,9 +5,14 @@ const actions = {
     editTask({ commit }, { index, task }) {
         commit('EDIT_TASK', { index, task })
     },
-    deleteTask({ commit }, index) {
-        commit('DELETE_TASK', index)
-    }
+    deleteTask({ commit }, id) {
+        commit('DELETE_TASK', id)
+    },
+    getTaskById({ state, commit }, id) {
+        const task = state.tasks.find(task => task.id === id)
+        commit('GET_TASK_BYID', task)
+    },
+
 }
 
 export default actions

@@ -1,36 +1,52 @@
 <script>
 import addTask from "./components/addTask.vue";
-// eslint-disable-next-line no-unused-vars
+import editTask from "./components/editTask.vue";
 
 export default {
   components: {
     addTask,
+    editTask,
   },
   data() {
     return {
       searchKey: "",
-      items: this.$store.state.tasks.tasks ? this.$store.state.tasks.tasks : [],
+      showActions: false,
+      items: this.$store.state.tasks.tasks
+        ? this.$store.state.tasks.tasks.map((item) => ({
+            ...item,
+            showActions: false,
+          }))
+        : [],
       showAddTask: false,
+      showTaskById: false,
+      task: {},
     };
   },
   computed: {
     filteredList() {
-      return this.items.filter(item => {
+      return this.items.filter((item) => {
         return item.name.toLowerCase().includes(this.searchKey.toLowerCase());
       });
-    }
+    },
   },
   methods: {
     showAddCop() {
       this.showAddTask = true;
     },
-    closeWindow() {
+    closeAdd() {
       this.showAddTask = false;
     },
-    
-  },
-  created() {
-  
+    closeEdit() {
+      this.showTaskById = false;
+    },
+    deleteTask(id) {
+      this.$store.dispatch("deleteTask", id);
+      window.location.reload();
+    },
+    editTask(id) {
+      this.task = this.items.find((item) => item.id === id);
+      this.showTaskById = true;
+    },
   },
 };
 </script>
@@ -42,7 +58,7 @@ export default {
     class="px-4 sm:px-6 pink-400 lg:px-4 xl:px-6 pt-4 pb-4 sm:pb-6 lg:pb-4 xl:pb-6 space-y-4"
   >
     <div
-      @click="closeWindow"
+      @click="closeAdd"
       v-if="showAddTask"
       class="fixed cursor-pointer inset-0 backdrop-blur-xl z-20"
     ></div>
@@ -92,15 +108,33 @@ export default {
       class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-4"
     >
       <li v-for="item in filteredList" :key="item.id">
-        <a
+        <div
           :style="{ background: item.color }"
-          href=""
-          class="hover:bg-light-blue-500 hover:border-transparent hover:shadow-lg group block rounded-lg p-8 border border-gray-200"
+          @mouseover="item.showActions = true"
+          @mouseleave="item.showActions = false"
+          class="hover:bg-light-blue-500
+           relative 
+           hover:border-transparent
+           hover:shadow-lg group block rounded-lg p-8 border border-gray-200"
         >
-          <dl
-            class="grid sm:block lg:grid xl:block grid-cols-2 grid-rows-2 items-center"
+          <button
+            v-show="item.showActions"
+            @click="deleteTask(item.id)"
+            class="absolute bottom-5 right-5 bg-white px-1.5 py-1 rounded z-2"
           >
-            <div class="lg:flex lg:justify-between">
+            delete
+          </button>
+          <button
+            @click="editTask(item.id)"
+            v-show="item.showActions"
+            class="absolute bottom-5 right-20 bg-white px-1.5 py-1 rounded z-2"
+          >
+            edit
+          </button>
+          <dl
+            class="block sm:block lg:grid xl:block  grid-cols-1 md:grid-rows-2 md:grid-cols-2 items-center"
+          >
+            <div class="flex justify-between">
               <dt class="sr-only">Title</dt>
               <dd
                 class="group-hover:text-black leading-6 font-medium text-black"
@@ -110,9 +144,14 @@ export default {
               <dd>{{ item.data }}</dd>
             </div>
             <div>
-              <dt class="sr-only">Priority</dt>
+              <dt class="sr-only">Level</dt>
               <dd
-                class="group-hover:text-light-blue-200 text-sm font-medium sm:mb-4 lg:mb-0 xl:mb-4"
+                :class="[
+                  { 'bg-pink-800': item.level == 'urgent' },
+                  { 'bg-teal-500': item.level == 'normal' },
+                  { 'bg-lime-400': item.level == 'slow' },
+                ]"
+                class="text-white text-sm leading-6 font-medium py-1 px-3 mt-4 rounded-lg w-fit group-hover:text-light-blue-200 text-sm font-medium sm:mb-4 lg:mb-0 xl:mb-4"
               >
                 {{ item.level }}
               </dd>
@@ -126,7 +165,7 @@ export default {
               </dd>
             </div>
           </dl>
-        </a>
+        </div>
       </li>
       <li @click="showAddCop" class="hover:shadow-lg flex rounded-lg">
         <div
@@ -142,5 +181,8 @@ export default {
     tabindex="-1"
     aria-hidden="true"
     v-if="showAddTask"
+    :closeAdd="closeAdd"
   />
+
+  <editTask :closeEdit="closeEdit" v-if="showTaskById" :task="task"></editTask>
 </template>
