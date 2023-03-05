@@ -1,5 +1,4 @@
-# Simple TO-DO App with features(add,listing,edit, delete and search).
-
+### Simple TO-DO App with features :
 
 - Add: Allows users to add new tasks to their to-do list
 - Listing: Displays a list of tasks that the user has added
